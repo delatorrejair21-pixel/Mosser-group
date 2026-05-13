@@ -9,10 +9,10 @@ import { services } from '@/data/content'
 // ─── Drop your 4 service photos into /public/images/ and update these paths ───
 // Each image corresponds to the service card in the same position (01, 02, 03, 04)
 const SERVICE_IMAGES = [
-  '/images/service-buying.jpg',      // 01 — Buying a Home
-  '/images/service-selling.jpg',     // 02 — Selling a Home
-  '/images/service-relocation.jpg',  // 03 — Relocation Guidance
-  '/images/service-luxury.jpg',      // 04 — Luxury Real Estate
+  '/images/service-buying.png',      // 01 — Buying a Home
+  '/images/service-selling.png',     // 02 — Selling a Home
+  '/images/service-relocation.png',  // 03 — Relocation Guidance
+  '/images/service-luxury.png',      // 04 — Luxury Real Estate
 ]
 
 function EyebrowWipe({ text, className }: { text: string; className?: string }) {
