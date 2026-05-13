@@ -66,7 +66,9 @@ export async function getSiteSettings(): Promise<SanitySettings | null> {
   return client.fetch<SanitySettings | null>(
     `*[_type == "siteSettings"][0]{
       agentName, firmName, affiliation,
-      heroTagline, heroImage, heroStats,
+      heroTagline,
+      "heroImage": select(defined(heroImage.asset) => heroImage, null),
+      heroStats,
       aboutEyebrow, aboutHeadline, aboutParagraphs, aboutValues,
       contactPhone, contactEmail, contactAddress,
       instagram, linkedin, facebook
@@ -92,7 +94,8 @@ export async function getProperties(): Promise<SanityProperty[] | null> {
   if (!isConfigured()) return null
   const results = await client.fetch<SanityProperty[]>(
     `*[_type == "property"] | order(order asc) {
-      _id, location, price, status, beds, baths, sqft, image
+      _id, location, price, status, beds, baths, sqft,
+      "image": select(defined(image.asset) => image, null)
     }`,
     {},
     { next: { revalidate: 60 } }
