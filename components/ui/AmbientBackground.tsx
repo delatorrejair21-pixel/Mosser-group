@@ -1,125 +1,123 @@
 'use client'
 
-import { motion, useReducedMotion } from 'framer-motion'
+// Pure CSS animations — runs entirely on the compositor thread (GPU).
+// Framer Motion JS-driven repeat:Infinity on 24 elements caused main-thread jank.
 
-// Orbs: large blurred radial-gradient blobs drifting diagonally
-// All values are static to avoid SSR/hydration mismatch
+const KEYFRAMES = `
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes orbA {
+      0%,100% { transform: translate(-50%,-50%) translate3d(0,0,0); }
+      38%      { transform: translate(-50%,-50%) translate3d(26px,32px,0); }
+      72%      { transform: translate(-50%,-50%) translate3d(-16px,-20px,0); }
+    }
+    @keyframes orbB {
+      0%,100% { transform: translate(-50%,-50%) translate3d(0,0,0); }
+      42%      { transform: translate(-50%,-50%) translate3d(-22px,28px,0); }
+      74%      { transform: translate(-50%,-50%) translate3d(14px,-18px,0); }
+    }
+    @keyframes orbC {
+      0%,100% { transform: translate(-50%,-50%) translate3d(0,0,0); }
+      50%      { transform: translate(-50%,-50%) translate3d(18px,-24px,0); }
+    }
+    @keyframes moteA {
+      0%,100% { transform: translate3d(0,0,0); }
+      50%      { transform: translate3d(9px,12px,0); }
+    }
+    @keyframes moteB {
+      0%,100% { transform: translate3d(0,0,0); }
+      50%      { transform: translate3d(-8px,11px,0); }
+    }
+    @keyframes moteC {
+      0%,100% { transform: translate3d(0,0,0); }
+      50%      { transform: translate3d(7px,-10px,0); }
+    }
+  }
+`
+
+// 3 orbs — large blurred radial gradients, slow diagonal drift
 const ORBS = [
-  { left: '8%',  top: '12%', size: 540, opacity: 0.062, dur: 32, del: 0    },
-  { left: '70%', top: '60%', size: 620, opacity: 0.050, dur: 40, del: -13  },
-  { left: '40%', top: '82%', size: 440, opacity: 0.042, dur: 50, del: -24  },
-  { left: '86%', top: '18%', size: 380, opacity: 0.038, dur: 36, del: -7   },
+  { left: '8%',  top: '14%', size: 520, opacity: 0.07,  anim: 'orbA', dur: '32s', del: '0s'   },
+  { left: '72%', top: '62%', size: 580, opacity: 0.055, anim: 'orbB', dur: '41s', del: '-13s' },
+  { left: '42%', top: '84%', size: 420, opacity: 0.045, anim: 'orbC', dur: '52s', del: '-24s' },
 ] as const
 
-// Drift keyframes per orb — slight diagonal to echo logo geometry
-const orbDrift = (i: number) => {
-  const s = i % 2 === 0 ? 1 : -1
-  return {
-    x: [0, s * 28, s * -18, 0],
-    y: [0, s * 34, s * -22, 0],
-  }
-}
-
-// Dust particles: tiny motes, slow diagonal drift, static positions
-const PARTICLES = [
-  { l: '4%',  t: '8%',  sz: 1.5, op: 0.11, dur: 34, del: 0,   dx: 9,  dy: 12 },
-  { l: '13%', t: '35%', sz: 1.0, op: 0.08, dur: 29, del: -5,  dx: -7, dy: 10 },
-  { l: '19%', t: '72%', sz: 2.0, op: 0.06, dur: 42, del: -13, dx: 8,  dy: 11 },
-  { l: '27%', t: '16%', sz: 1.0, op: 0.09, dur: 37, del: -8,  dx: -9, dy: 13 },
-  { l: '33%', t: '58%', sz: 1.5, op: 0.07, dur: 46, del: -21, dx: 10, dy: 14 },
-  { l: '42%', t: '90%', sz: 1.0, op: 0.08, dur: 31, del: -3,  dx: -6, dy: 9  },
-  { l: '50%', t: '23%', sz: 2.0, op: 0.05, dur: 40, del: -17, dx: 7,  dy: 10 },
-  { l: '56%', t: '47%', sz: 1.0, op: 0.10, dur: 35, del: -9,  dx: -8, dy: 12 },
-  { l: '63%', t: '78%', sz: 1.5, op: 0.07, dur: 44, del: -26, dx: 9,  dy: 11 },
-  { l: '71%', t: '11%', sz: 1.0, op: 0.09, dur: 38, del: -6,  dx: -7, dy: 13 },
-  { l: '78%', t: '53%', sz: 2.0, op: 0.05, dur: 52, del: -19, dx: 8,  dy: 10 },
-  { l: '85%', t: '31%', sz: 1.0, op: 0.08, dur: 33, del: -2,  dx: -9, dy: 12 },
-  { l: '92%', t: '69%', sz: 1.5, op: 0.09, dur: 41, del: -15, dx: 7,  dy: 11 },
-  { l: '97%', t: '91%', sz: 1.0, op: 0.06, dur: 47, del: -23, dx: -8, dy: 9  },
-  { l: '7%',  t: '93%', sz: 1.0, op: 0.07, dur: 39, del: -11, dx: 10, dy: 13 },
-  { l: '22%', t: '44%', sz: 1.5, op: 0.08, dur: 45, del: -28, dx: -7, dy: 10 },
-  { l: '47%', t: '66%', sz: 1.0, op: 0.06, dur: 32, del: -4,  dx: 9,  dy: 14 },
-  { l: '59%', t: '19%', sz: 2.0, op: 0.07, dur: 43, del: -20, dx: -8, dy: 11 },
-  { l: '74%', t: '85%', sz: 1.0, op: 0.05, dur: 55, del: -35, dx: 7,  dy: 9  },
-  { l: '89%', t: '5%',  sz: 1.5, op: 0.09, dur: 30, del: -1,  dx: -9, dy: 12 },
+// 12 motes — sub-2px dots, very slow drift, low opacity
+const MOTES = [
+  { l: '5%',  t: '9%',  sz: 1.5, op: 0.10, anim: 'moteA', dur: '34s', del: '0s'   },
+  { l: '14%', t: '36%', sz: 1.0, op: 0.07, anim: 'moteB', dur: '29s', del: '-5s'  },
+  { l: '25%', t: '70%', sz: 2.0, op: 0.06, anim: 'moteC', dur: '43s', del: '-14s' },
+  { l: '38%', t: '18%', sz: 1.0, op: 0.09, anim: 'moteA', dur: '37s', del: '-8s'  },
+  { l: '50%', t: '54%', sz: 1.5, op: 0.07, anim: 'moteB', dur: '46s', del: '-21s' },
+  { l: '60%', t: '88%', sz: 1.0, op: 0.08, anim: 'moteC', dur: '31s', del: '-3s'  },
+  { l: '68%', t: '22%', sz: 2.0, op: 0.05, anim: 'moteA', dur: '40s', del: '-17s' },
+  { l: '78%', t: '46%', sz: 1.0, op: 0.09, anim: 'moteB', dur: '35s', del: '-9s'  },
+  { l: '86%', t: '75%', sz: 1.5, op: 0.06, anim: 'moteC', dur: '44s', del: '-26s' },
+  { l: '93%', t: '12%', sz: 1.0, op: 0.08, anim: 'moteA', dur: '38s', del: '-6s'  },
+  { l: '30%', t: '93%', sz: 1.0, op: 0.07, anim: 'moteB', dur: '50s', del: '-30s' },
+  { l: '55%', t: '33%', sz: 1.5, op: 0.06, anim: 'moteC', dur: '42s', del: '-19s' },
 ] as const
 
 export default function AmbientBackground() {
-  const reduced = useReducedMotion()
-
   return (
-    <div
-      aria-hidden
-      className="absolute inset-0 overflow-hidden pointer-events-none select-none"
-      style={{ zIndex: 0 }}
-    >
-      {/* Gradient orbs — deep forest green, heavily blurred */}
-      {ORBS.map((orb, i) => (
-        <motion.div
-          key={i}
-          className="absolute rounded-full"
-          style={{
-            left: orb.left,
-            top: orb.top,
-            width: orb.size,
-            height: orb.size,
-            opacity: orb.opacity,
-            background:
-              'radial-gradient(circle at 40% 40%, rgba(52,92,68,0.9) 0%, rgba(27,58,41,0.55) 42%, transparent 68%)',
-            filter: 'blur(72px)',
-            transform: 'translate(-50%, -50%)',
-          }}
-          animate={reduced ? undefined : orbDrift(i)}
-          transition={{
-            duration: orb.dur,
-            delay: orb.del,
-            repeat: Infinity,
-            repeatType: 'mirror',
-            ease: 'easeInOut',
-          }}
-        />
-      ))}
-
-      {/* Dust particles — faint parchment motes, slow diagonal drift */}
-      {PARTICLES.map((p, i) => (
-        <motion.div
-          key={i}
-          className="absolute rounded-full"
-          style={{
-            left: p.l,
-            top: p.t,
-            width: p.sz,
-            height: p.sz,
-            opacity: p.op,
-            backgroundColor: 'rgba(230, 222, 206, 0.9)',
-          }}
-          animate={
-            reduced
-              ? undefined
-              : {
-                  x: [0, p.dx, -p.dx * 0.6, 0],
-                  y: [0, p.dy, -p.dy * 0.7, 0],
-                  opacity: [p.op, p.op * 1.4, p.op * 0.5, p.op],
-                }
-          }
-          transition={{
-            duration: p.dur,
-            delay: p.del,
-            repeat: Infinity,
-            repeatType: 'loop',
-            ease: 'easeInOut',
-          }}
-        />
-      ))}
-
-      {/* Very faint diagonal grain texture overlay */}
+    <>
+      <style dangerouslySetInnerHTML={{ __html: KEYFRAMES }} />
       <div
-        className="absolute inset-0 opacity-[0.018]"
-        style={{
-          backgroundImage:
-            'repeating-linear-gradient(135deg, rgba(230,222,206,0.6) 0px, transparent 1px, transparent 48px, rgba(230,222,206,0.6) 49px)',
-        }}
-      />
-    </div>
+        aria-hidden
+        className="absolute inset-0 overflow-hidden pointer-events-none select-none"
+        style={{ zIndex: 0 }}
+      >
+        {/* Gradient orbs */}
+        {ORBS.map((orb, i) => (
+          <div
+            key={i}
+            style={{
+              position: 'absolute',
+              left: orb.left,
+              top: orb.top,
+              width: orb.size,
+              height: orb.size,
+              borderRadius: '50%',
+              opacity: orb.opacity,
+              background:
+                'radial-gradient(circle at 38% 38%, rgba(52,92,68,0.95) 0%, rgba(27,58,41,0.5) 44%, transparent 68%)',
+              filter: 'blur(64px)',
+              transform: 'translate(-50%,-50%)',
+              willChange: 'transform',
+              animation: `${orb.anim} ${orb.dur} ${orb.del} ease-in-out infinite`,
+            }}
+          />
+        ))}
+
+        {/* Dust motes */}
+        {MOTES.map((m, i) => (
+          <div
+            key={i}
+            style={{
+              position: 'absolute',
+              left: m.l,
+              top: m.t,
+              width: m.sz,
+              height: m.sz,
+              borderRadius: '50%',
+              opacity: m.op,
+              backgroundColor: 'rgba(230,222,206,0.9)',
+              willChange: 'transform',
+              animation: `${m.anim} ${m.dur} ${m.del} ease-in-out infinite`,
+            }}
+          />
+        ))}
+
+        {/* Faint diagonal grain — 135° matches logo geometry */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            opacity: 0.018,
+            backgroundImage:
+              'repeating-linear-gradient(135deg, rgba(230,222,206,0.5) 0px, transparent 1px, transparent 52px, rgba(230,222,206,0.5) 53px)',
+          }}
+        />
+      </div>
+    </>
   )
 }
