@@ -23,31 +23,30 @@
 }
 
 /* ── Ambient background keyframes ─────────────────────────────────────── */
+/* alternating direction is set on the element, so keyframes go 0→100 only */
 @keyframes orbA {
-  0%,100% { transform: translate(-50%,-50%) translate3d(0,0,0); }
-  38%      { transform: translate(-50%,-50%) translate3d(26px,32px,0); }
-  72%      { transform: translate(-50%,-50%) translate3d(-16px,-20px,0); }
+  from { transform: translate(-50%,-50%) translate3d(0,0,0); }
+  to   { transform: translate(-50%,-50%) translate3d(55px,65px,0); }
 }
 @keyframes orbB {
-  0%,100% { transform: translate(-50%,-50%) translate3d(0,0,0); }
-  42%      { transform: translate(-50%,-50%) translate3d(-22px,28px,0); }
-  74%      { transform: translate(-50%,-50%) translate3d(14px,-18px,0); }
+  from { transform: translate(-50%,-50%) translate3d(0,0,0); }
+  to   { transform: translate(-50%,-50%) translate3d(-50px,60px,0); }
 }
 @keyframes orbC {
-  0%,100% { transform: translate(-50%,-50%) translate3d(0,0,0); }
-  50%      { transform: translate(-50%,-50%) translate3d(18px,-24px,0); }
+  from { transform: translate(-50%,-50%) translate3d(0,0,0); }
+  to   { transform: translate(-50%,-50%) translate3d(45px,-55px,0); }
 }
 @keyframes moteA {
-  0%,100% { transform: translate3d(0,0,0); }
-  50%      { transform: translate3d(9px,12px,0); }
+  from { transform: translate3d(0,0,0); }
+  to   { transform: translate3d(18px,24px,0); }
 }
 @keyframes moteB {
-  0%,100% { transform: translate3d(0,0,0); }
-  50%      { transform: translate3d(-8px,11px,0); }
+  from { transform: translate3d(0,0,0); }
+  to   { transform: translate3d(-16px,22px,0); }
 }
 @keyframes moteC {
-  0%,100% { transform: translate3d(0,0,0); }
-  50%      { transform: translate3d(7px,-10px,0); }
+  from { transform: translate3d(0,0,0); }
+  to   { transform: translate3d(14px,-20px,0); }
 }
 @media (prefers-reduced-motion: reduce) {
   .ambient-orb, .ambient-mote { animation: none !important; }

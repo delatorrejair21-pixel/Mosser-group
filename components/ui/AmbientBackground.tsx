@@ -1,24 +1,26 @@
 'use client'
 
+// Orbs: large blurred green blobs drifting slowly across the section
 const ORBS = [
-  { left: '8%',  top: '14%', size: 520, opacity: 0.07,  anim: 'orbA', dur: '32s', del: '0s'   },
-  { left: '72%', top: '62%', size: 580, opacity: 0.055, anim: 'orbB', dur: '41s', del: '-13s' },
-  { left: '42%', top: '84%', size: 420, opacity: 0.045, anim: 'orbC', dur: '52s', del: '-24s' },
+  { left: '8%',  top: '14%', size: 500, opacity: 0.14, anim: 'orbA', dur: '18s', del: '0s'  },
+  { left: '72%', top: '58%', size: 560, opacity: 0.11, anim: 'orbB', dur: '22s', del: '-7s' },
+  { left: '42%', top: '80%', size: 420, opacity: 0.10, anim: 'orbC', dur: '26s', del: '-12s'},
 ] as const
 
+// Motes: visible floating dust — 3–5px, higher opacity so they actually read
 const MOTES = [
-  { l: '5%',  t: '9%',  sz: 1.5, op: 0.10, anim: 'moteA', dur: '34s', del: '0s'   },
-  { l: '14%', t: '36%', sz: 1.0, op: 0.07, anim: 'moteB', dur: '29s', del: '-5s'  },
-  { l: '25%', t: '70%', sz: 2.0, op: 0.06, anim: 'moteC', dur: '43s', del: '-14s' },
-  { l: '38%', t: '18%', sz: 1.0, op: 0.09, anim: 'moteA', dur: '37s', del: '-8s'  },
-  { l: '50%', t: '54%', sz: 1.5, op: 0.07, anim: 'moteB', dur: '46s', del: '-21s' },
-  { l: '60%', t: '88%', sz: 1.0, op: 0.08, anim: 'moteC', dur: '31s', del: '-3s'  },
-  { l: '68%', t: '22%', sz: 2.0, op: 0.05, anim: 'moteA', dur: '40s', del: '-17s' },
-  { l: '78%', t: '46%', sz: 1.0, op: 0.09, anim: 'moteB', dur: '35s', del: '-9s'  },
-  { l: '86%', t: '75%', sz: 1.5, op: 0.06, anim: 'moteC', dur: '44s', del: '-26s' },
-  { l: '93%', t: '12%', sz: 1.0, op: 0.08, anim: 'moteA', dur: '38s', del: '-6s'  },
-  { l: '30%', t: '93%', sz: 1.0, op: 0.07, anim: 'moteB', dur: '50s', del: '-30s' },
-  { l: '55%', t: '33%', sz: 1.5, op: 0.06, anim: 'moteC', dur: '42s', del: '-19s' },
+  { l: '5%',  t: '9%',  sz: 3, op: 0.22, anim: 'moteA', dur: '14s', del: '0s'   },
+  { l: '14%', t: '36%', sz: 2, op: 0.18, anim: 'moteB', dur: '11s', del: '-3s'  },
+  { l: '25%', t: '70%', sz: 4, op: 0.15, anim: 'moteC', dur: '17s', del: '-8s'  },
+  { l: '38%', t: '18%', sz: 2, op: 0.20, anim: 'moteA', dur: '13s', del: '-5s'  },
+  { l: '50%', t: '54%', sz: 3, op: 0.16, anim: 'moteB', dur: '19s', del: '-11s' },
+  { l: '60%', t: '88%', sz: 2, op: 0.18, anim: 'moteC', dur: '12s', del: '-2s'  },
+  { l: '68%', t: '22%', sz: 4, op: 0.13, anim: 'moteA', dur: '20s', del: '-9s'  },
+  { l: '78%', t: '46%', sz: 2, op: 0.20, anim: 'moteB', dur: '15s', del: '-6s'  },
+  { l: '86%', t: '75%', sz: 3, op: 0.15, anim: 'moteC', dur: '18s', del: '-14s' },
+  { l: '93%', t: '12%', sz: 2, op: 0.18, anim: 'moteA', dur: '16s', del: '-4s'  },
+  { l: '30%', t: '93%', sz: 3, op: 0.14, anim: 'moteB', dur: '22s', del: '-17s' },
+  { l: '55%', t: '33%', sz: 4, op: 0.13, anim: 'moteC', dur: '21s', del: '-10s' },
 ] as const
 
 export default function AmbientBackground() {
@@ -39,11 +41,16 @@ export default function AmbientBackground() {
             height: orb.size,
             opacity: orb.opacity,
             background:
-              'radial-gradient(circle at 38% 38%, rgba(52,92,68,0.95) 0%, rgba(27,58,41,0.5) 44%, transparent 68%)',
-            filter: 'blur(64px)',
+              'radial-gradient(circle at 38% 38%, rgba(52,92,68,1) 0%, rgba(27,58,41,0.6) 44%, transparent 68%)',
+            filter: 'blur(60px)',
             transform: 'translate(-50%,-50%)',
             willChange: 'transform',
-            animation: `${orb.anim} ${orb.dur} ${orb.del} ease-in-out infinite`,
+            animationName: orb.anim,
+            animationDuration: orb.dur,
+            animationDelay: orb.del,
+            animationTimingFunction: 'ease-in-out',
+            animationIterationCount: 'infinite',
+            animationDirection: 'alternate',
           }}
         />
       ))}
@@ -58,20 +65,26 @@ export default function AmbientBackground() {
             width: m.sz,
             height: m.sz,
             opacity: m.op,
-            backgroundColor: 'rgba(230,222,206,0.9)',
+            backgroundColor: 'rgba(205,195,175,1)',
             willChange: 'transform',
-            animation: `${m.anim} ${m.dur} ${m.del} ease-in-out infinite`,
+            animationName: m.anim,
+            animationDuration: m.dur,
+            animationDelay: m.del,
+            animationTimingFunction: 'ease-in-out',
+            animationIterationCount: 'infinite',
+            animationDirection: 'alternate',
           }}
         />
       ))}
 
+      {/* Diagonal grain line at 135° — matches logo geometry */}
       <div
         style={{
           position: 'absolute',
           inset: 0,
-          opacity: 0.018,
+          opacity: 0.025,
           backgroundImage:
-            'repeating-linear-gradient(135deg, rgba(230,222,206,0.5) 0px, transparent 1px, transparent 52px, rgba(230,222,206,0.5) 53px)',
+            'repeating-linear-gradient(135deg, rgba(230,222,206,0.6) 0px, transparent 1px, transparent 52px, rgba(230,222,206,0.6) 53px)',
         }}
       />
     </div>
