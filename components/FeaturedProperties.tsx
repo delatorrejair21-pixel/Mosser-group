@@ -48,7 +48,7 @@ export default function FeaturedProperties({ sanityProperties }: Props) {
         beds:     p.beds,
         baths:    p.baths,
         sqft:     p.sqft,
-        imageUrl: p.image ? urlFor(p.image).width(800).height(520).url() : null,
+        imageUrl: p.image ? urlFor(p.image)?.width(800).height(520).url() ?? null : null,
         imageAlt: p.image?.alt ?? p.location,
       }))
     : staticProperties.map((p) => ({

@@ -31,7 +31,7 @@ export default function Hero({ sanitySettings }: Props) {
     : heroStats
 
   const heroImageUrl = sanitySettings?.heroImage
-    ? urlFor(sanitySettings.heroImage).width(1200).url()
+    ? urlFor(sanitySettings.heroImage)?.width(1200).url() ?? null
     : null
 
   const [firstName, ...rest] = agentName.split(' ')
