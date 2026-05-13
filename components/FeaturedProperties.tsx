@@ -78,7 +78,7 @@ export default function FeaturedProperties({ sanityProperties }: Props) {
           </div>
           <FadeInView delay={0.2}>
             <a
-              href="#contact"
+              href="/listings"
               className="flex-shrink-0 font-sans text-sm tracking-wide text-moss-800 border-b border-moss-800/40 pb-0.5 hover:border-moss-800 transition-all duration-300 whitespace-nowrap"
             >
               View all listings →
