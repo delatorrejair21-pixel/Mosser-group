@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  ::selection {
+    background-color: #1B3A29;
+    color: #F5F0E8;
+  }
+
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-parchment-50 text-stone-900;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Luxury thin divider line */
+  .divider-h {
+    @apply block w-12 h-px bg-current opacity-30;
+  }
+
+  /* Section eyebrow label */
+  .eyebrow {
+    @apply text-xs font-sans font-semibold tracking-widest-xl uppercase;
+  }
+}
