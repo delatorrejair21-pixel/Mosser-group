@@ -5,6 +5,9 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Menu, X } from 'lucide-react'
 import { brand } from '@/data/content'
+import type { SanitySettings } from '@/sanity/queries'
+
+type Props = { sanitySettings?: SanitySettings | null }
 
 const navLinks = [
   { label: 'About',      href: '#about' },
@@ -13,7 +16,7 @@ const navLinks = [
   { label: 'Contact',    href: '#contact' },
 ]
 
-export default function Navbar() {
+export default function Navbar({ sanitySettings }: Props) {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -71,7 +74,7 @@ export default function Navbar() {
               href="#contact"
               className="ml-2 px-6 py-2.5 bg-moss-800 text-parchment-100 text-[13px] font-sans tracking-wide hover:bg-moss-700 transition-colors duration-300"
             >
-              Work With Sara
+              Work With {sanitySettings?.agentName?.split(' ')[0] ?? 'Sara'}
             </a>
           </div>
 
@@ -122,12 +125,12 @@ export default function Navbar() {
             onClick={() => setMenuOpen(false)}
             className="mt-4 px-10 py-3.5 bg-parchment-200 text-moss-900 font-sans text-sm tracking-wide hover:bg-white transition-colors duration-300"
           >
-            Work With Sara
+            Work With {sanitySettings?.agentName?.split(' ')[0] ?? 'Sara'}
           </a>
         </nav>
 
         <div className="absolute bottom-10 text-parchment-500 text-[10px] font-sans tracking-widest uppercase">
-          {brand.name} · {brand.affiliation}
+          {sanitySettings?.firmName ?? brand.name} · {sanitySettings?.affiliation ?? brand.affiliation}
         </div>
       </div>
     </>

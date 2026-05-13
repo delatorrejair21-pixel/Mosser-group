@@ -3,6 +3,9 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { brand } from '@/data/content'
+import type { SanitySettings } from '@/sanity/queries'
+
+type Props = { sanitySettings?: SanitySettings | null }
 
 const footerLinks = [
   { label: 'About',      href: '#about' },
@@ -11,7 +14,10 @@ const footerLinks = [
   { label: 'Contact',    href: '#contact' },
 ]
 
-export default function Footer() {
+export default function Footer({ sanitySettings }: Props) {
+  const firmName    = sanitySettings?.firmName    ?? brand.name
+  const affiliation = sanitySettings?.affiliation ?? brand.affiliation
+  const tagline     = sanitySettings?.heroTagline ?? brand.tagline
   const year = new Date().getFullYear()
 
   return (
@@ -31,11 +37,11 @@ export default function Footer() {
               className="h-14 w-auto object-contain brightness-0 invert mb-5"
             />
             <p className="text-[10px] font-sans tracking-wider uppercase text-parchment-600/70 mb-5">
-              {brand.affiliation} · Atlanta, GA
+              {affiliation} · Atlanta, GA
             </p>
             <div className="w-10 h-px bg-parchment-600/30 mb-5" />
             <p className="font-display text-2xl font-light italic text-parchment-400 max-w-xs leading-snug">
-              &ldquo;{brand.tagline}&rdquo;
+              &ldquo;{tagline}&rdquo;
             </p>
           </div>
 
@@ -56,7 +62,7 @@ export default function Footer() {
         {/* Bottom row */}
         <div className="pt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <p className="text-[11px] font-sans text-parchment-600/60">
-            &copy; {year} {brand.name}. All rights reserved.
+            &copy; {year} {firmName}. All rights reserved.
           </p>
           <p className="text-[11px] font-sans text-parchment-600/40">
             Licensed Real Estate Agent · Georgia · Keller Williams Realty

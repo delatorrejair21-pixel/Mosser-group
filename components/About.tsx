@@ -5,6 +5,9 @@ import { useRef } from 'react'
 import FadeInView from '@/components/ui/FadeInView'
 import TextReveal from '@/components/ui/TextReveal'
 import { about } from '@/data/content'
+import type { SanitySettings } from '@/sanity/queries'
+
+type Props = { sanitySettings?: SanitySettings | null }
 
 function EyebrowWipe({ text, className }: { text: string; className?: string }) {
   const ref = useRef(null)
@@ -23,7 +26,17 @@ function EyebrowWipe({ text, className }: { text: string; className?: string }) 
   )
 }
 
-export default function About() {
+export default function About({ sanitySettings }: Props) {
+  // Sanity data takes priority; static content.ts is the fallback
+  const eyebrow    = sanitySettings?.aboutEyebrow    ?? about.eyebrow
+  const headline   = sanitySettings?.aboutHeadline   ?? about.headline
+  const paragraphs = sanitySettings?.aboutParagraphs?.length
+    ? sanitySettings.aboutParagraphs
+    : about.paragraphs
+  const values     = sanitySettings?.aboutValues?.length
+    ? sanitySettings.aboutValues
+    : about.values
+
   return (
     <section id="about" className="bg-parchment-50 py-28 lg:py-40">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
@@ -32,24 +45,19 @@ export default function About() {
           {/* Left */}
           <FadeInView direction="right">
             <div>
-              <EyebrowWipe text={about.eyebrow} className="text-moss-700" />
-
+              <EyebrowWipe text={eyebrow} className="text-moss-700" />
               <TextReveal
-                text={about.headline}
+                text={headline}
                 className="font-display text-5xl md:text-6xl font-light leading-tight text-stone-900 mb-10"
                 stagger={0.06}
               />
-
               <div className="space-y-5">
-                {about.paragraphs.map((p, i) => (
+                {paragraphs.map((p, i) => (
                   <FadeInView key={i} delay={0.15 + i * 0.1}>
-                    <p className="font-sans text-base md:text-lg text-stone-600 leading-relaxed">
-                      {p}
-                    </p>
+                    <p className="font-sans text-base md:text-lg text-stone-600 leading-relaxed">{p}</p>
                   </FadeInView>
                 ))}
               </div>
-
               <FadeInView delay={0.35}>
                 <div className="mt-12">
                   <a
@@ -66,7 +74,7 @@ export default function About() {
           {/* Right — Values */}
           <FadeInView direction="left" delay={0.1}>
             <div className="divide-y divide-parchment-300/70">
-              {about.values.map((value, i) => (
+              {values.map((value, i) => (
                 <motion.div
                   key={value.title}
                   className="py-8 group"
@@ -80,12 +88,8 @@ export default function About() {
                       {String(i + 1).padStart(2, '0')}
                     </span>
                     <div>
-                      <h3 className="font-display text-xl font-medium text-stone-900 mb-2">
-                        {value.title}
-                      </h3>
-                      <p className="font-sans text-stone-500 text-sm leading-relaxed">
-                        {value.desc}
-                      </p>
+                      <h3 className="font-display text-xl font-medium text-stone-900 mb-2">{value.title}</h3>
+                      <p className="font-sans text-stone-500 text-sm leading-relaxed">{value.desc}</p>
                     </div>
                   </div>
                 </motion.div>

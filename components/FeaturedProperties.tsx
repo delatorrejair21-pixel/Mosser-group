@@ -2,9 +2,14 @@
 
 import { motion, useInView } from 'framer-motion'
 import { useRef } from 'react'
+import Image from 'next/image'
 import TextReveal from '@/components/ui/TextReveal'
 import FadeInView from '@/components/ui/FadeInView'
-import { properties } from '@/data/content'
+import { properties as staticProperties } from '@/data/content'
+import { urlFor } from '@/sanity/image'
+import type { SanityProperty } from '@/sanity/queries'
+
+type Props = { sanityProperties?: SanityProperty[] | null }
 
 const placeholderGradients = [
   'from-moss-100 via-parchment-300 to-parchment-200',
@@ -29,15 +34,39 @@ function EyebrowWipe({ text, className }: { text: string; className?: string }) 
   )
 }
 
-export default function FeaturedProperties() {
+export default function FeaturedProperties({ sanityProperties }: Props) {
   const gridRef = useRef(null)
   const isInView = useInView(gridRef, { once: true, margin: '-80px' })
+
+  // Normalise Sanity and static data into the same shape
+  const items = sanityProperties
+    ? sanityProperties.map((p) => ({
+        id:       p._id,
+        location: p.location,
+        price:    p.price,
+        status:   p.status,
+        beds:     p.beds,
+        baths:    p.baths,
+        sqft:     p.sqft,
+        imageUrl: p.image ? urlFor(p.image).width(800).height(520).url() : null,
+        imageAlt: p.image?.alt ?? p.location,
+      }))
+    : staticProperties.map((p) => ({
+        id:       String(p.id),
+        location: p.location,
+        price:    p.price,
+        status:   p.status,
+        beds:     p.beds,
+        baths:    p.baths,
+        sqft:     p.sqft,
+        imageUrl: null as string | null,
+        imageAlt: p.location,
+      }))
 
   return (
     <section id="properties" className="bg-parchment-100 py-28 lg:py-40">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
 
-        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-8 mb-16">
           <div>
             <EyebrowWipe text="Featured Listings" className="text-moss-700" />
@@ -57,12 +86,8 @@ export default function FeaturedProperties() {
           </FadeInView>
         </div>
 
-        {/* Cards */}
-        <div
-          ref={gridRef}
-          className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
-        >
-          {properties.map((property, i) => (
+        <div ref={gridRef} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+          {items.map((property, i) => (
             <motion.article
               key={property.id}
               className="bg-white group cursor-pointer overflow-hidden"
@@ -73,20 +98,25 @@ export default function FeaturedProperties() {
             >
               {/* Image */}
               <div className="relative h-64 overflow-hidden">
-                {/*
-                  Replace with:
-                  <Image src={property.image} fill alt={property.location} className="object-cover group-hover:scale-105 transition-transform duration-700" />
-                */}
-                <motion.div
-                  className={`absolute inset-0 bg-gradient-to-br ${placeholderGradients[i]}`}
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.7 }}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
-                  <div className="absolute bottom-4 left-4 text-[10px] font-sans tracking-widest uppercase text-moss-700/50">
-                    Add property-{i + 1}.jpg
-                  </div>
-                </motion.div>
+                {property.imageUrl ? (
+                  <Image
+                    src={property.imageUrl}
+                    fill
+                    alt={property.imageAlt}
+                    className="object-cover group-hover:scale-105 transition-transform duration-700"
+                  />
+                ) : (
+                  <motion.div
+                    className={`absolute inset-0 bg-gradient-to-br ${placeholderGradients[i % 3]}`}
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.7 }}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
+                    <div className="absolute bottom-4 left-4 text-[10px] font-sans tracking-widest uppercase text-moss-700/50">
+                      Upload photo in CMS
+                    </div>
+                  </motion.div>
+                )}
 
                 {/* Status badge */}
                 <div className="absolute top-4 right-4 z-10">
@@ -94,6 +124,8 @@ export default function FeaturedProperties() {
                     className={`px-3 py-1 text-[10px] font-sans font-semibold tracking-widest uppercase ${
                       property.status === 'Active'
                         ? 'bg-moss-800 text-parchment-100'
+                        : property.status === 'Under Contract'
+                        ? 'bg-amber-700 text-white'
                         : 'bg-parchment-500 text-moss-900'
                     }`}
                   >
@@ -117,16 +149,17 @@ export default function FeaturedProperties() {
                   <span className="text-[12px] font-sans text-stone-500">
                     <strong className="font-semibold text-stone-700">{property.baths}</strong> Baths
                   </span>
-                  <span className="text-[12px] font-sans text-stone-500">
-                    <strong className="font-semibold text-stone-700">{property.sqft}</strong> sqft
-                  </span>
+                  {property.sqft && (
+                    <span className="text-[12px] font-sans text-stone-500">
+                      <strong className="font-semibold text-stone-700">{property.sqft}</strong> sqft
+                    </span>
+                  )}
                 </div>
               </div>
             </motion.article>
           ))}
         </div>
 
-        {/* CTA */}
         <FadeInView delay={0.3}>
           <div className="mt-16 text-center">
             <a
