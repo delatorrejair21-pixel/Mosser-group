@@ -41,9 +41,9 @@ export default function AmbientBackground() {
 
     // Orbs — large blurred radial glows
     const orbs: Orb[] = [
-      { x: W * 0.08, y: H * 0.14, r: 260, vx: 0.18, vy: 0.22, color: [44, 80, 58],  alpha: 0.18 },
-      { x: W * 0.72, y: H * 0.60, r: 290, vx:-0.16, vy: 0.20, color: [36, 70, 50],  alpha: 0.15 },
-      { x: W * 0.42, y: H * 0.82, r: 220, vx: 0.14, vy:-0.18, color: [52, 90, 65],  alpha: 0.13 },
+      { x: W * 0.08, y: H * 0.14, r: 260, vx: 0.55, vy: 0.65, color: [44, 80, 58],  alpha: 0.18 },
+      { x: W * 0.72, y: H * 0.60, r: 290, vx:-0.50, vy: 0.60, color: [36, 70, 50],  alpha: 0.15 },
+      { x: W * 0.42, y: H * 0.82, r: 220, vx: 0.45, vy:-0.55, color: [52, 90, 65],  alpha: 0.13 },
     ]
 
     // Motes — tiny floating dust particles
@@ -51,8 +51,8 @@ export default function AmbientBackground() {
       x: W * (0.05 + i * 0.068),
       y: H * (0.1 + (i % 5) * 0.18),
       r: 1.5 + (i % 3) * 0.8,
-      vx: (i % 2 === 0 ? 0.12 : -0.10) + (i % 3) * 0.03,
-      vy: 0.08 + (i % 4) * 0.04,
+      vx: (i % 2 === 0 ? 0.38 : -0.32) + (i % 3) * 0.08,
+      vy: 0.25 + (i % 4) * 0.10,
       alpha: 0.12 + (i % 5) * 0.04,
     }))
 
