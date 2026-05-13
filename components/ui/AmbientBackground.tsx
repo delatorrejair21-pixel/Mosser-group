@@ -1,92 +1,125 @@
 'use client'
 
-// Orbs: large blurred green blobs drifting slowly across the section
-const ORBS = [
-  { left: '8%',  top: '14%', size: 500, opacity: 0.14, anim: 'orbA', dur: '18s', del: '0s'  },
-  { left: '72%', top: '58%', size: 560, opacity: 0.11, anim: 'orbB', dur: '22s', del: '-7s' },
-  { left: '42%', top: '80%', size: 420, opacity: 0.10, anim: 'orbC', dur: '26s', del: '-12s'},
-] as const
+import { useEffect, useRef } from 'react'
 
-// Motes: visible floating dust — 3–5px, higher opacity so they actually read
-const MOTES = [
-  { l: '5%',  t: '9%',  sz: 3, op: 0.22, anim: 'moteA', dur: '14s', del: '0s'   },
-  { l: '14%', t: '36%', sz: 2, op: 0.18, anim: 'moteB', dur: '11s', del: '-3s'  },
-  { l: '25%', t: '70%', sz: 4, op: 0.15, anim: 'moteC', dur: '17s', del: '-8s'  },
-  { l: '38%', t: '18%', sz: 2, op: 0.20, anim: 'moteA', dur: '13s', del: '-5s'  },
-  { l: '50%', t: '54%', sz: 3, op: 0.16, anim: 'moteB', dur: '19s', del: '-11s' },
-  { l: '60%', t: '88%', sz: 2, op: 0.18, anim: 'moteC', dur: '12s', del: '-2s'  },
-  { l: '68%', t: '22%', sz: 4, op: 0.13, anim: 'moteA', dur: '20s', del: '-9s'  },
-  { l: '78%', t: '46%', sz: 2, op: 0.20, anim: 'moteB', dur: '15s', del: '-6s'  },
-  { l: '86%', t: '75%', sz: 3, op: 0.15, anim: 'moteC', dur: '18s', del: '-14s' },
-  { l: '93%', t: '12%', sz: 2, op: 0.18, anim: 'moteA', dur: '16s', del: '-4s'  },
-  { l: '30%', t: '93%', sz: 3, op: 0.14, anim: 'moteB', dur: '22s', del: '-17s' },
-  { l: '55%', t: '33%', sz: 4, op: 0.13, anim: 'moteC', dur: '21s', del: '-10s' },
-] as const
+interface Orb {
+  x: number; y: number; r: number
+  vx: number; vy: number
+  color: [number, number, number]; alpha: number
+}
+
+interface Mote {
+  x: number; y: number; r: number
+  vx: number; vy: number; alpha: number
+}
 
 export default function AmbientBackground() {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    let raf: number
+    let W = 0, H = 0
+
+    function resize() {
+      if (!canvas) return
+      W = canvas.offsetWidth
+      H = canvas.offsetHeight
+      canvas.width  = W
+      canvas.height = H
+    }
+
+    resize()
+    const ro = new ResizeObserver(resize)
+    ro.observe(canvas)
+
+    // Orbs — large blurred radial glows
+    const orbs: Orb[] = [
+      { x: W * 0.08, y: H * 0.14, r: 260, vx: 0.18, vy: 0.22, color: [44, 80, 58],  alpha: 0.18 },
+      { x: W * 0.72, y: H * 0.60, r: 290, vx:-0.16, vy: 0.20, color: [36, 70, 50],  alpha: 0.15 },
+      { x: W * 0.42, y: H * 0.82, r: 220, vx: 0.14, vy:-0.18, color: [52, 90, 65],  alpha: 0.13 },
+    ]
+
+    // Motes — tiny floating dust particles
+    const motes: Mote[] = Array.from({ length: 14 }, (_, i) => ({
+      x: W * (0.05 + i * 0.068),
+      y: H * (0.1 + (i % 5) * 0.18),
+      r: 1.5 + (i % 3) * 0.8,
+      vx: (i % 2 === 0 ? 0.12 : -0.10) + (i % 3) * 0.03,
+      vy: 0.08 + (i % 4) * 0.04,
+      alpha: 0.12 + (i % 5) * 0.04,
+    }))
+
+    // Orb bounce bounds with padding so they don't disappear at edges
+    function tickOrbs() {
+      for (const o of orbs) {
+        o.x += o.vx
+        o.y += o.vy
+        const pad = o.r * 0.4
+        if (o.x < pad || o.x > W - pad) o.vx *= -1
+        if (o.y < pad || o.y > H - pad) o.vy *= -1
+      }
+    }
+
+    function tickMotes() {
+      for (const m of motes) {
+        m.x += m.vx
+        m.y += m.vy
+        if (m.x < 0)  m.x = W
+        if (m.x > W)  m.x = 0
+        if (m.y < 0)  m.y = H
+        if (m.y > H)  m.y = 0
+      }
+    }
+
+    function drawOrb(o: Orb) {
+      const g = ctx!.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.r)
+      const [r, g2, b] = o.color
+      g.addColorStop(0,   `rgba(${r},${g2},${b},${o.alpha})`)
+      g.addColorStop(0.45,`rgba(${r},${g2},${b},${o.alpha * 0.4})`)
+      g.addColorStop(1,   `rgba(${r},${g2},${b},0)`)
+      ctx!.beginPath()
+      ctx!.arc(o.x, o.y, o.r, 0, Math.PI * 2)
+      ctx!.fillStyle = g
+      ctx!.fill()
+    }
+
+    function drawMote(m: Mote) {
+      ctx!.beginPath()
+      ctx!.arc(m.x, m.y, m.r, 0, Math.PI * 2)
+      ctx!.fillStyle = `rgba(205,195,170,${m.alpha})`
+      ctx!.fill()
+    }
+
+    function draw() {
+      ctx!.clearRect(0, 0, W, H)
+      tickOrbs()
+      tickMotes()
+      for (const o of orbs)  drawOrb(o)
+      for (const m of motes) drawMote(m)
+      raf = requestAnimationFrame(draw)
+    }
+
+    raf = requestAnimationFrame(draw)
+
+    return () => {
+      cancelAnimationFrame(raf)
+      ro.disconnect()
+    }
+  }, [])
+
   return (
-    <div
+    <canvas
+      ref={canvasRef}
       aria-hidden
-      className="absolute inset-0 overflow-hidden pointer-events-none select-none"
+      className="absolute inset-0 w-full h-full pointer-events-none select-none"
       style={{ zIndex: 0 }}
-    >
-      {ORBS.map((orb, i) => (
-        <div
-          key={i}
-          className="ambient-orb absolute rounded-full"
-          style={{
-            left: orb.left,
-            top: orb.top,
-            width: orb.size,
-            height: orb.size,
-            opacity: orb.opacity,
-            background:
-              'radial-gradient(circle at 38% 38%, rgba(52,92,68,1) 0%, rgba(27,58,41,0.6) 44%, transparent 68%)',
-            filter: 'blur(60px)',
-            transform: 'translate(-50%,-50%)',
-            willChange: 'transform',
-            animationName: orb.anim,
-            animationDuration: orb.dur,
-            animationDelay: orb.del,
-            animationTimingFunction: 'ease-in-out',
-            animationIterationCount: 'infinite',
-            animationDirection: 'alternate',
-          }}
-        />
-      ))}
-
-      {MOTES.map((m, i) => (
-        <div
-          key={i}
-          className="ambient-mote absolute rounded-full"
-          style={{
-            left: m.l,
-            top: m.t,
-            width: m.sz,
-            height: m.sz,
-            opacity: m.op,
-            backgroundColor: 'rgba(205,195,175,1)',
-            willChange: 'transform',
-            animationName: m.anim,
-            animationDuration: m.dur,
-            animationDelay: m.del,
-            animationTimingFunction: 'ease-in-out',
-            animationIterationCount: 'infinite',
-            animationDirection: 'alternate',
-          }}
-        />
-      ))}
-
-      {/* Diagonal grain line at 135° — matches logo geometry */}
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          opacity: 0.025,
-          backgroundImage:
-            'repeating-linear-gradient(135deg, rgba(230,222,206,0.6) 0px, transparent 1px, transparent 52px, rgba(230,222,206,0.6) 53px)',
-        }}
-      />
-    </div>
+    />
   )
 }

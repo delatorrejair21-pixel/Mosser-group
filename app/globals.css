@@ -22,35 +22,6 @@
   }
 }
 
-/* ── Ambient background keyframes ─────────────────────────────────────── */
-/* alternating direction is set on the element, so keyframes go 0→100 only */
-@keyframes orbA {
-  from { transform: translate(-50%,-50%) translate3d(0,0,0); }
-  to   { transform: translate(-50%,-50%) translate3d(55px,65px,0); }
-}
-@keyframes orbB {
-  from { transform: translate(-50%,-50%) translate3d(0,0,0); }
-  to   { transform: translate(-50%,-50%) translate3d(-50px,60px,0); }
-}
-@keyframes orbC {
-  from { transform: translate(-50%,-50%) translate3d(0,0,0); }
-  to   { transform: translate(-50%,-50%) translate3d(45px,-55px,0); }
-}
-@keyframes moteA {
-  from { transform: translate3d(0,0,0); }
-  to   { transform: translate3d(18px,24px,0); }
-}
-@keyframes moteB {
-  from { transform: translate3d(0,0,0); }
-  to   { transform: translate3d(-16px,22px,0); }
-}
-@keyframes moteC {
-  from { transform: translate3d(0,0,0); }
-  to   { transform: translate3d(14px,-20px,0); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .ambient-orb, .ambient-mote { animation: none !important; }
-}
 
 @layer utilities {
   .text-balance {
