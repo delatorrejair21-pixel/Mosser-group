@@ -5,7 +5,6 @@
 
 import { defineConfig } from 'sanity'
 import { structureTool } from 'sanity/structure'
-// @ts-expect-error — @sanity/vision types may not be present in all setups
 import { visionTool } from '@sanity/vision'
 import { schemaTypes } from './sanity/schemas'
 

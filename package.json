@@ -10,15 +10,17 @@
   },
   "dependencies": {
     "@sanity/image-url": "^2.1.1",
+    "@sanity/vision": "^5.25.0",
     "framer-motion": "^11.0.0",
     "gsap": "^3.15.0",
     "lenis": "^1.1.14",
     "lucide-react": "^0.400.0",
-    "next": "14.2.29",
+    "next": "^16.2.6",
     "next-sanity": "^12.4.5",
-    "react": "^18",
-    "react-dom": "^18",
-    "sanity": "^5.25.0"
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "sanity": "^5.25.0",
+    "styled-components": "^6.4.1"
   },
   "devDependencies": {
     "@types/node": "^20",
