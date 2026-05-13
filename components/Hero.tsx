@@ -126,7 +126,7 @@ export default function Hero() {
       </motion.div>
 
       {/* ── RIGHT PANEL — Portrait with parallax ───────────────────────────── */}
-      <div className="relative lg:w-[52%] h-[55vw] lg:h-screen order-1 lg:order-2 overflow-hidden">
+      <div className="relative lg:w-[52%] h-[80vw] sm:h-[65vw] lg:h-screen order-1 lg:order-2 overflow-hidden">
         <motion.div
           className="absolute inset-0"
           style={{ y: imageY }}
