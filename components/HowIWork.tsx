@@ -4,6 +4,7 @@ import { motion, useInView } from 'framer-motion'
 import { useRef } from 'react'
 import TextReveal from '@/components/ui/TextReveal'
 import FadeInView from '@/components/ui/FadeInView'
+import AmbientBackground from '@/components/ui/AmbientBackground'
 import { process, brand } from '@/data/content'
 
 function EyebrowWipe({ text, className }: { text: string; className?: string }) {
@@ -28,16 +29,19 @@ export default function HowIWork() {
   const isInView = useInView(stepsRef, { once: true, margin: '-100px' })
 
   return (
-    <section id="process" className="bg-moss-800 py-28 lg:py-40 relative overflow-hidden">
+    <section id="process" className="bg-[#080C0A] py-28 lg:py-40 relative overflow-hidden">
+
+      {/* Ambient motion layer */}
+      <AmbientBackground />
 
       {/* Subtle background vertical lines */}
-      <div className="absolute inset-0 opacity-[0.04] pointer-events-none">
+      <div className="absolute inset-0 opacity-[0.035] pointer-events-none" style={{ zIndex: 1 }}>
         <div className="absolute top-0 left-1/4 w-px h-full bg-parchment-100" />
         <div className="absolute top-0 left-2/4 w-px h-full bg-parchment-100" />
         <div className="absolute top-0 left-3/4 w-px h-full bg-parchment-100" />
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-6 lg:px-12">
+      <div className="relative max-w-7xl mx-auto px-6 lg:px-12" style={{ zIndex: 2 }}>
 
         {/* Header */}
         <div className="mb-20 max-w-2xl">
