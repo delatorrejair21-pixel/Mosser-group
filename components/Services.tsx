@@ -40,10 +40,7 @@ export default function Services() {
   const isAnyHovered = hovered !== null
 
   return (
-    <section
-      className="relative bg-white py-28 lg:py-40 overflow-hidden"
-      onMouseLeave={() => setHovered(null)}
-    >
+    <section className="relative bg-white py-28 lg:py-40 overflow-hidden">
 
       {/* ── Full-section background images — one per service ───────────── */}
       {SERVICE_IMAGES.map((src, i) => (
@@ -82,6 +79,7 @@ export default function Services() {
         {/* Cards grid */}
         <div
           ref={gridRef}
+          onMouseLeave={() => setHovered(null)}
           className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px"
           style={{ background: isAnyHovered ? 'rgba(255,255,255,0.06)' : 'rgba(200,190,175,0.5)' }}
         >
