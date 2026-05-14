@@ -49,7 +49,7 @@ export default function Services() {
       {SERVICE_IMAGES.map((src, i) => (
         <motion.div
           key={i}
-          className="absolute inset-0 z-0"
+          className="absolute inset-0 z-0 pointer-events-none"
           animate={{ opacity: hovered === i ? 1 : 0 }}
           transition={{ duration: 0.6, ease }}
         >
